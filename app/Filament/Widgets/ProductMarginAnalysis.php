@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\Product;
 use Filament\Widgets\ChartWidget;
 
 class ProductMarginAnalysis extends ChartWidget
@@ -10,27 +11,18 @@ class ProductMarginAnalysis extends ChartWidget
 
     protected function getData(): array
     {
+        $products = Product::query()
+            ->where('is_active', true)
+            ->select(['name', 'price', 'stock_quantity'])
+            ->get();
         return [
             'datasets' => [
                 [
                     'label' => 'Products',
-                    'data' => [
-                        ['x' => 20, 'y' => 85],
-                        ['x' => 25, 'y' => 98],
-                        ['x' => 35, 'y' => 5],
-                        ['x' => 50, 'y' => 330],
-                        ['x' => 58, 'y' => 305],
-                        ['x' => 22, 'y' => 78],
-                        ['x' => 70, 'y' => 68],
-                        ['x' => 80, 'y' => 89],
-                        ['x' => 90, 'y' => 88],
-                        ['x' => 100, 'y' => 90],
-                        ['x' => 110, 'y' => 95],
-                        ['x' => 120, 'y' => 66],
-                        ['x' => 130, 'y' => 56],
-                        ['x' => 140, 'y' => 87],
-                        ['x' => 150, 'y' => 81],
-    ],
+                    'data' => $products->map(fn (Product $product) => [
+                        'x' => (float) $product->price,
+                        'y' => (int) $product->stock_quantity,
+                    ])->values()->all(),
                     'backgroundColor' => '#3b82f6',
                 ],
             ],
@@ -40,5 +32,26 @@ class ProductMarginAnalysis extends ChartWidget
     protected function getType(): string
     {
         return 'scatter';
+    }
+
+    protected function getOptions(): array
+    {
+        return [
+            'scales' => [
+                'x' => [
+                    'title' => [
+                        'display' => true,
+                        'text' => 'Product Price',
+                    ],
+                ],
+                'y' => [
+                    'beginAtZero' => true,
+                    'title' => [
+                        'display' => true,
+                        'text' => 'Stock Quantity',
+                    ],
+                ],
+            ],
+        ];
     }
 }
