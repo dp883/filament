@@ -108,25 +108,37 @@ class OrderForm
                     ])
                     ->required()
                     ->default('pending'),
-                TextInput::make('payment_method'),
+                Select::make('payment_method')
+                    ->options([
+                        'pending' => 'Pending',
+                        'processing' => 'Processing',
+                        'completed' => 'Completed',
+                        'cancelled' => 'Cancelled',
+                    ]),
                 TextInput::make('subtotal')
                     ->prefix('$')
                     ->readOnly()
                     ->dehydrated()
                     ->required(),
                 TextInput::make('tax')
+                    ->label('Tax')
                     ->required()
                     ->numeric()
+                    ->prefix('$')
                     ->default(0.0),
                 TextInput::make('shipping_cost')
+                    ->label('Shipping Cost')
                     ->required()
                     ->numeric()
                     ->default(0.0)
                     ->prefix('$'),
                 TextInput::make('total')
-                    ->required()
+                    ->label('Grand Total')
                     ->numeric()
-                    ->default(0.0),
+                    ->prefix('$')
+                    ->readOnly()
+                    ->dehydrated()
+                    ->default(0),
                 TextInput::make('shipping_name')
                     ->required(),
                 TextInput::make('shipping_phone')
